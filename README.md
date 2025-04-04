@@ -142,7 +142,7 @@ Model Hub URL: [https://huggingface.co/3004lakshu/audio-deepfake-model](https://
 To understand the goals, objectives, and evaluation criteria of this internship task, please refer to the detailed documentation below:
 
 **Task Document (Google Docs):**  
-[View Full Internship Task Document](https://docs.google.com/document/d/your-google-doc-link-here)
+[View Full Internship Task Document](https://docs.google.com/document/d/1A-vxewmCHlzjVEGx68Wg65CItiBBgoLNYx_Xd-3UcZk/edit?usp=sharing)
 
 ---
 
