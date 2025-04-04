@@ -70,7 +70,7 @@ python app/app.py --input path/to/audio.wav
 
 ## Dataset  
 
-We use the **3004lakshu/for-norm** dataset available on Hugging Face. It contains labeled samples of real and deepfake audio.
+I have used the **3004lakshu/for-norm** dataset available on Hugging Face. It contains labeled samples of real and deepfake audio.
 
 ### How to Access the Dataset  
 1. Install the Hugging Face datasets library:
