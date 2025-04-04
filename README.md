@@ -152,7 +152,7 @@ A screen recording of the Streamlit interface demonstrating the detection proces
 
 **Watch the demo here:** 
 
-[![Watch the demo](https://i.imgur.com/your-thumbnail-id.png)](https://drive.google.com/file/d/1Wl4rqkgmrAE0OWKcelehZdtTSFzeTu_8/view?usp=sharing)
+[Watch the demo](https://drive.google.com/file/d/1Wl4rqkgmrAE0OWKcelehZdtTSFzeTu_8/view?usp=sharing)
 
 ---
 ## Contributing
