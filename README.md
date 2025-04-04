@@ -117,23 +117,32 @@ This hybrid model architecture improves classification accuracy by combining bot
 
 ---
 
-## Pre-trained Model  
+## Fine-Tuned Model
 
-A fine-tuned `.pth` model file is available via Hugging Face Model Hub.
+This repository contains a **fine-tuned `.pth` model** using the `wav2vec2` architecture for audio deepfake detection.  
+The model has been trained and optimized on a custom dataset for the task.
 
-### How to Use  
-1. Install `huggingface_hub`:
+---
+
+### How to Use
+
+1. **Install the Hugging Face Hub library** (if you haven't already):
+
    ```bash
    pip install huggingface_hub
-   ```
+   huggingface-cli login
 
-2. Download the model:
-   ```python
+   ```
+2. **Download the model:**
+   ```
    from huggingface_hub import hf_hub_download
-   model_path = hf_hub_download(repo_id="3004lakshu/audio-deepfake-model", filename="deepfake_model.pth")
+   model_path = hf_hub_download(
+    repo_id="3004lakshu/wav2vec2_trained",
+    filename="deepfake_model.pth"
+   )
    ```
-
-Model Hub URL: [https://huggingface.co/3004lakshu/audio-deepfake-model](https://huggingface.co/3004lakshu/audio-deepfake-model)
+## Model Hub URL:
+https://huggingface.co/3004lakshu/wav2vec2_trained
 
 ---
 
