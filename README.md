@@ -81,7 +81,7 @@ I have used the **3004lakshu/for-norm** dataset available on Hugging Face. It co
 2. Load the dataset in your script:
    ```python
    from datasets import load_dataset
-   dataset = load_dataset("3004lakshu/for-norm")
+   dataset = load_dataset("3004lakshu/Deepfake-Audio")
    ```
 
 3. Explore the dataset:
@@ -89,7 +89,7 @@ I have used the **3004lakshu/for-norm** dataset available on Hugging Face. It co
    print(dataset)
    ```
 
-Link: [https://huggingface.co/datasets/3004lakshu/for-norm](https://huggingface.co/datasets/3004lakshu/for-norm)
+Link: [https://huggingface.co/datasets/3004lakshu/Deepfake-Audio](https://huggingface.co/datasets/3004lakshu/Deepfake-Audio)
 
 ---
 
