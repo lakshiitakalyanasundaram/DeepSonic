@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepFake Audio Detector</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background: linear-gradient(135deg, #6e48aa 0%, #9d50bb 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            flex: 1;
+            min-width: 300px;
+        }
+
+        h2 {
+            color: #6e48aa;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .panel-content {
+            margin-top: 1.5rem;
+        }
+
+        .input-method {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .input-method label {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .button-primary {
+            background-color: #6e48aa;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .button-primary:hover {
+            background-color: #9d50bb;
+        }
+
+        .button-primary:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .button-icon {
+            margin-right: 8px;
+        }
+
+        .upload-container {
+            border: 2px dashed #ddd;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-container:hover {
+            border-color: #6e48aa;
+            background-color: #f9f5ff;
+        }
+
+        .upload-container p {
+            margin: 10px 0 0;
+            color: #666;
+        }
+
+        .mic-container {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .recorder-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .file-details {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            display: none;
+        }
+
+        #waveform {
+            margin-top: 20px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            height: 100px;
+        }
+
+        .result-container {
+            text-align: center;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: all 0.3s;
+            display: none;
+        }
+
+        .result-real {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-fake {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .result-container h3 {
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+
+        .confidence {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 5px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-value {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+
+        .steps-list {
+            list-style-type: none;
+            counter-reset: steps;
+            padding-left: 0;
+        }
+
+        .steps-list li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .steps-list li::before {
+            counter-increment: steps;
+            content: counter(steps);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: #6e48aa;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>DeepFake Audio Detector</h1>
+        <div class="subtitle">Analyze audio to detect AI-generated content</div>
+    </header>
+
+    <div class="container">
+        <div class="panel">
+            <h2>Upload & Analyze</h2>
+            <div class="panel-content">
+                <div class="input-method">
+                    <label>
+                        <input type="radio" name="input-type" value="file" checked> 
+                        File Upload
+                    </label>
+                    <label>
+                        <input type="radio" name="input-type" value="mic"> 
+                        Microphone
+                    </label>
+                </div>
+                
+                <div id="file-input-container">
+                    <div class="upload-container" id="drop-area">
+                        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 16.5V7.5M12 7.5L8.5 11M12 7.5L15.5 11" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 21H8C4.6863 21 2 18.3137 2 15C2 11.6863 4.6863 9 8 9C8 5.6863 10.6863 3 14 3C17.3137 3 20 5.6863 20 9C20 9 22 9 22 13C22 17 19 21 16 21Z" stroke="#6e48aa" stroke-width="1.5"/>
+                        </svg>
+                        <h3>Drag & Drop .WAV File</h3>
+                        <p>or click to browse files</p>
+                        <input type="file" id="file-upload" accept=".wav" style="display: none;">
+                    </div>
+                    
+                    <div class="file-details" id="file-details">
+                        <div>Selected file: <span id="file-name">No file selected</span></div>
+                        <div>Size: <span id="file-size">-</span></div>
+                        <div>Duration: <span id="file-duration">-</span></div>
+                        <div id="waveform"></div>
+                    </div>
+                </div>
+                
+                <div id="mic-input-container" class="mic-container">
+                    <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 15.5C14.21 15.5 16 13.71 16 11.5V6C16 3.79 14.21 2 12 2C9.79 2 8 3.79 8 6V11.5C8 13.71 9.79 15.5 12 15.5Z" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4.35 9.65V11.35C4.35 15.57 7.78 19 12 19C16.22 19 19.65 15.57 19.65 11.35V9.65" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 19V22" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <h3>Microphone Recording</h3>
+                    <p id="rec-status">Press record to start</p>
+                    <div class="recorder-controls">
+                        <button id="startRecord" class="button-primary">
+                            <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="8" fill="currentColor"/>
+                            </svg>
+                            Record
+                        </button>
+                        <button id="stopRecord" class="button-primary" disabled>
+                            <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="6" y="6" width="12" height="12" fill="currentColor"/>
+                            </svg>
+                            Stop
+                        </button>
+                    </div>
+                    <div id="mic-waveform" style="margin-top: 20px; height: 100px;"></div>
+                </div>
+                
+                <button id="analyze-button" class="button-primary" style="width: 100%; margin-top: 20px;" disabled>
+                    <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9.5 16.5L14.5 12L9.5 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Analyze Audio
+                </button>
+                
+                <div class="result-container" id="result-container">
+                    <h3 id="result-title">Analysis Result</h3>
+                    <div class="confidence">
+                        Confidence: <span id="confidence-value">0</span>%
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-value" id="confidence-bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <h2>How to Use</h2>
+            <div class="panel-content">
+                <ul class="steps-list">
+                    <li>
+                        <strong>Choose Input Method:</strong> Select either "File Upload" to analyze a pre-recorded .WAV file or "Microphone" to perform real-time analysis.
+                    </li>
+                    <li>
+                        <strong>For File Upload:</strong> Drag and drop a .WAV file into the upload area, or click to browse for a file. The system only accepts .WAV audio files.
+                    </li>
+                    <li>
+                        <strong>For Microphone:</strong> Click the "Record" button to start capturing audio from your microphone. Click "Stop" when you want to end the recording.
+                    </li>
+                    <li>
+                        <strong>Analyze:</strong> Click the "Analyze Audio" button to process the audio and determine if it's genuine or AI-generated.
+                    </li>
+                    <li>
+                        <strong>View Results:</strong> The system will display whether the audio is likely "Real" or "Fake" with a confidence percentage.
+                    </li>
+                </ul>
+                
+                <h3 style="margin-top: 30px; color: #6e48aa;">About This Tool</h3>
+                <p>
+                    This tool uses advanced machine learning algorithms to analyze acoustic patterns, 
+                    artifacts, and inconsistencies that are typically present in AI-generated or 
+                    manipulated audio content.
+                </p>
+                <p>
+                    While our detector aims for high accuracy, please note that deepfake technology 
+                    continues to evolve. For critical situations, always use multiple verification methods.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        &copy; 2025 DeepFake Audio Detector | For educational and verification purposes only
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.6.4/wavesurfer.min.js"></script>
+    <script>
+        // DOM Elements
+        const fileInput = document.getElementById('file-upload');
+        const dropArea = document.getElementById('drop-area');
+        const fileDetails = document.getElementById('file-details');
+        const fileName = document.getElementById('file-name');
+        const fileSize = document.getElementById('file-size');
+        const fileDuration = document.getElementById('file-duration');
+        const fileContainer = document.getElementById('file-input-container');
+        const micContainer = document.getElementById('mic-input-container');
+        const startRecordBtn = document.getElementById('startRecord');
+        const stopRecordBtn = document.getElementById('stopRecord');
+        const recStatus = document.getElementById('rec-status');
+        const analyzeBtn = document.getElementById('analyze-button');
+        const resultContainer = document.getElementById('result-container');
+        const resultTitle = document.getElementById('result-title');
+        const confidenceValue = document.getElementById('confidence-value');
+        const confidenceBar = document.getElementById('confidence-bar');
+        
+        // Input type selection
+        const inputTypeRadios = document.querySelectorAll('input[name="input-type"]');
+        inputTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'file') {
+                    fileContainer.style.display = 'block';
+                    micContainer.style.display = 'none';
+                    analyzeBtn.disabled = true;
+                    resultContainer.style.display = 'none';
+                } else {
+                    fileContainer.style.display = 'none';
+                    micContainer.style.display = 'block';
+                    analyzeBtn.disabled = true;
+                    resultContainer.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize WaveSurfer
+        const wavesurfer = WaveSurfer.create({
+            container: '#waveform',
+            waveColor: '#9d50bb',
+            progressColor: '#6e48aa',
+            cursorColor: '#333',
+            barWidth: 2,
+            barGap: 1,
+            responsive: true,
+            height: 100
+        });
+        
+        const micWavesurfer = WaveSurfer.create({
+            container: '#mic-waveform',
+            waveColor: '#9d50bb',
+            progressColor: '#6e48aa',
+            cursorColor: '#333',
+            barWidth: 2,
+            barGap: 1,
+            responsive: true,
+            height: 100
+        });
+
+        // File Upload Handling
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', handleFileSelect);
+
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#6e48aa';
+            dropArea.style.backgroundColor = '#f9f5ff';
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.borderColor = '#ddd';
+            dropArea.style.backgroundColor = 'transparent';
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#ddd';
+            dropArea.style.backgroundColor = 'transparent';
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelect();
+            }
+        });
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (!file || !file.type.includes('audio')) {
+                alert('Please select a valid audio file (.wav format)');
+                return;
+            }
+            
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileDetails.style.display = 'block';
+            analyzeBtn.disabled = false;
+            resultContainer.style.display = 'none';
+            
+            // Load audio file into WaveSurfer
+            const fileURL = URL.createObjectURL(file);
+            wavesurfer.load(fileURL);
+            
+            wavesurfer.on('ready', function() {
+                fileDuration.textContent = formatTime(wavesurfer.getDuration());
+            });
+        }
+
+        // Microphone Recording Handling
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+        
+        startRecordBtn.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    micWavesurfer.load(audioUrl);
+                    analyzeBtn.disabled = false;
+                };
+                
+                mediaRecorder.start();
+                startRecordBtn.disabled = true;
+                stopRecordBtn.disabled = false;
+                recStatus.textContent = "Recording... (speak now)";
+                recStatus.style.color = "#dc3545";
+            } catch (err) {
+                console.error('Error accessing microphone:', err);
+                alert('Unable to access microphone. Please check permissions.');
+            }
+        });
+        
+        stopRecordBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                startRecordBtn.disabled = false;
+                stopRecordBtn.disabled = true;
+                recStatus.textContent = "Recording stopped";
+                recStatus.style.color = "initial";
+            }
+        });
+
+        // Analysis Button
+        analyzeBtn.addEventListener('click', () => {
+            // Show loading state
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = 'Analyzing...';
+            
+            // Simulate analysis delay (replace with actual API call)
+            setTimeout(() => {
+                // Reset button
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 16.5L14.5 12L9.5 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg> Analyze Audio';
+                
+                // Simulate random result (replace with actual analysis results)
+                const isReal = Math.random() > 0.5;
+                const confidence = Math.floor(60 + Math.random() * 35); // Random confidence between 60-95%
+                
+                // Display result
+                resultContainer.style.display = 'block';
+                resultContainer.className = 'result-container ' + (isReal ? 'result-real' : 'result-fake');
+                resultTitle.textContent = isReal ? 'Real Audio Detected' : 'Fake Audio Detected';
+                confidenceValue.textContent = confidence;
+                
+                // Set confidence bar
+                confidenceBar.style.width = confidence + '%';
+                confidenceBar.style.backgroundColor = isReal ? '#28a745' : '#dc3545';
+                
+                // Scroll to results
+                resultContainer.scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+        });
+
+        // Utility functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return mins + ':' + (secs < 10 ? '0' : '') + secs;
+        }
+    </script>
+</body>
+</html>
