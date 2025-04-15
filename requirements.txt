@@ -5,4 +5,3 @@ numpy>=1.26.0
 transformers==4.38.2
 huggingface-hub==0.21.4
 werkzeug==3.0.1
-python-3.10.13
