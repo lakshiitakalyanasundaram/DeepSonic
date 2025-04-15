@@ -3,16 +3,11 @@
   "builds": [
     {
       "src": "app.py",
-      "use": "@vercel/python",
-      "config": {
-        "pythonVersion": "3.12"
-      }
+      "use": "@vercel/python"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "app.py"
-    }
-  ]
-} 
+  "build": {
+    "installCommand": "echo 'Skipping pip install'",
+    "buildCommand": "python app.py"
+  }
+}
