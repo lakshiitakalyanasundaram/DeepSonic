@@ -61,18 +61,6 @@
             margin-top: 1.5rem;
         }
 
-        .input-method {
-            display: flex;
-            margin-bottom: 20px;
-        }
-
-        .input-method label {
-            display: flex;
-            align-items: center;
-            margin-right: 20px;
-            cursor: pointer;
-        }
-
         .button-primary {
             background-color: #6e48aa;
             color: white;
@@ -119,19 +107,6 @@
             color: #666;
         }
 
-        .mic-container {
-            text-align: center;
-            padding: 20px;
-            display: none;
-        }
-
-        .recorder-controls {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
         .file-details {
             margin-top: 20px;
             padding: 15px;
@@ -144,7 +119,42 @@
             margin-top: 20px;
             background-color: #f5f5f5;
             border-radius: 5px;
-            height: 100px;
+            padding: 20px;
+            min-height: 128px;
+        }
+
+        .play-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            background-color: #6e48aa;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+
+        .play-button:hover {
+            background-color: #9d50bb;
+        }
+
+        .play-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .play-button .button-icon {
+            margin-right: 8px;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
         }
 
         .result-container {
@@ -221,6 +231,94 @@
             font-weight: bold;
         }
 
+        .input-option {
+            margin-bottom: 25px;
+        }
+
+        .input-option h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #6e48aa;
+        }
+
+        .select-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: white;
+            font-size: 1rem;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+        }
+
+        .select-container::after {
+            content: "▼";
+            font-size: 0.8rem;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6e48aa;
+            pointer-events: none;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #6e48aa;
+            box-shadow: 0 0 0 2px rgba(110, 72, 170, 0.2);
+        }
+
+        .input-separator {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .input-separator::before {
+            content: "";
+            display: block;
+            height: 1px;
+            width: 100%;
+            background-color: #eee;
+            position: absolute;
+            top: 50%;
+            left: 0;
+        }
+
+        .input-separator span {
+            background-color: white;
+            padding: 0 10px;
+            position: relative;
+            color: #666;
+        }
+
+        .file-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+
+        .file-tag-real {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .file-tag-fake {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
         footer {
             margin-top: 2rem;
             text-align: center;
@@ -240,25 +338,28 @@
 <body>
     <header>
         <h1>DeepFake Audio Detector</h1>
-        <div class="subtitle">Analyze audio to detect AI-generated content</div>
+        <div class="subtitle">Analyze audio files to detect AI-generated content</div>
     </header>
 
     <div class="container">
         <div class="panel">
             <h2>Upload & Analyze</h2>
-            <div class="panel-content">
-                <div class="input-method">
-                    <label>
-                        <input type="radio" name="input-type" value="file" checked> 
-                        File Upload
-                    </label>
-                    <label>
-                        <input type="radio" name="input-type" value="mic"> 
-                        Microphone
-                    </label>
+            <div class="panel-content">  
+                <div class="input-option">
+                    <h3>Select from Pre-uploaded Samples</h3>
+                    <div class="select-container">
+                        <select id="sample-selector">
+                            <option value="">-- Choose a sample file --</option>
+                        </select>
+                    </div>
                 </div>
-                
-                <div id="file-input-container">
+
+                <div class="input-separator">
+                    <span>OR</span>
+                </div>
+                              
+                <div class="input-option">
+                    <h3>Upload Your Own File</h3>
                     <div class="upload-container" id="drop-area">
                         <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 16.5V7.5M12 7.5L8.5 11M12 7.5L15.5 11" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -268,38 +369,13 @@
                         <p>or click to browse files</p>
                         <input type="file" id="file-upload" accept=".wav" style="display: none;">
                     </div>
-                    
-                    <div class="file-details" id="file-details">
-                        <div>Selected file: <span id="file-name">No file selected</span></div>
-                        <div>Size: <span id="file-size">-</span></div>
-                        <div>Duration: <span id="file-duration">-</span></div>
-                        <div id="waveform"></div>
-                    </div>
                 </div>
                 
-                <div id="mic-input-container" class="mic-container">
-                    <svg width="70" height="70" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 15.5C14.21 15.5 16 13.71 16 11.5V6C16 3.79 14.21 2 12 2C9.79 2 8 3.79 8 6V11.5C8 13.71 9.79 15.5 12 15.5Z" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M4.35 9.65V11.35C4.35 15.57 7.78 19 12 19C16.22 19 19.65 15.57 19.65 11.35V9.65" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M12 19V22" stroke="#6e48aa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <h3>Microphone Recording</h3>
-                    <p id="rec-status">Press record to start</p>
-                    <div class="recorder-controls">
-                        <button id="startRecord" class="button-primary">
-                            <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="12" cy="12" r="8" fill="currentColor"/>
-                            </svg>
-                            Record
-                        </button>
-                        <button id="stopRecord" class="button-primary" disabled>
-                            <svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <rect x="6" y="6" width="12" height="12" fill="currentColor"/>
-                            </svg>
-                            Stop
-                        </button>
-                    </div>
-                    <div id="mic-waveform" style="margin-top: 20px; height: 100px;"></div>
+                <div class="file-details" id="file-details">
+                    <div>Selected file: <span id="file-name">No file selected</span></div>
+                    <div>Size: <span id="file-size">-</span></div>
+                    <div>Duration: <span id="file-duration">-</span></div>
+                    <div id="waveform"></div>
                 </div>
                 
                 <button id="analyze-button" class="button-primary" style="width: 100%; margin-top: 20px;" disabled>
@@ -326,13 +402,13 @@
             <div class="panel-content">
                 <ul class="steps-list">
                     <li>
-                        <strong>Choose Input Method:</strong> Select either "File Upload" to analyze a pre-recorded .WAV file or "Microphone" to perform real-time analysis.
+                        <strong>Choose a Method:</strong> Either select from pre-uploaded sample files in the dropdown menu, or upload your own .WAV file.
                     </li>
                     <li>
-                        <strong>For File Upload:</strong> Drag and drop a .WAV file into the upload area, or click to browse for a file. The system only accepts .WAV audio files.
+                        <strong>Upload Your Audio (if using your own):</strong> Drag and drop a .WAV file into the upload area, or click to browse for a file. The system only accepts .WAV audio files.
                     </li>
                     <li>
-                        <strong>For Microphone:</strong> Click the "Record" button to start capturing audio from your microphone. Click "Stop" when you want to end the recording.
+                        <strong>Review File Details:</strong> After selecting or uploading, review the file details including name, size, and duration. You'll also see a visual waveform of your audio.
                     </li>
                     <li>
                         <strong>Analyze:</strong> Click the "Analyze Audio" button to process the audio and determine if it's genuine or AI-generated.
@@ -349,6 +425,15 @@
                     manipulated audio content.
                 </p>
                 <p>
+                    The detector examines various features of the audio including:
+                </p>
+                <ul>
+                    <li>Spectral inconsistencies</li>
+                    <li>Unnatural audio patterns</li>
+                    <li>Temporal anomalies</li>
+                    <li>Voice characteristics</li>
+                </ul>
+                <p>
                     While our detector aims for high accuracy, please note that deepfake technology 
                     continues to evolve. For critical situations, always use multiple verification methods.
                 </p>
@@ -361,207 +446,6 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/6.6.4/wavesurfer.min.js"></script>
-    <script>
-        // DOM Elements
-        const fileInput = document.getElementById('file-upload');
-        const dropArea = document.getElementById('drop-area');
-        const fileDetails = document.getElementById('file-details');
-        const fileName = document.getElementById('file-name');
-        const fileSize = document.getElementById('file-size');
-        const fileDuration = document.getElementById('file-duration');
-        const fileContainer = document.getElementById('file-input-container');
-        const micContainer = document.getElementById('mic-input-container');
-        const startRecordBtn = document.getElementById('startRecord');
-        const stopRecordBtn = document.getElementById('stopRecord');
-        const recStatus = document.getElementById('rec-status');
-        const analyzeBtn = document.getElementById('analyze-button');
-        const resultContainer = document.getElementById('result-container');
-        const resultTitle = document.getElementById('result-title');
-        const confidenceValue = document.getElementById('confidence-value');
-        const confidenceBar = document.getElementById('confidence-bar');
-        
-        // Input type selection
-        const inputTypeRadios = document.querySelectorAll('input[name="input-type"]');
-        inputTypeRadios.forEach(radio => {
-            radio.addEventListener('change', () => {
-                if (radio.value === 'file') {
-                    fileContainer.style.display = 'block';
-                    micContainer.style.display = 'none';
-                    analyzeBtn.disabled = true;
-                    resultContainer.style.display = 'none';
-                } else {
-                    fileContainer.style.display = 'none';
-                    micContainer.style.display = 'block';
-                    analyzeBtn.disabled = true;
-                    resultContainer.style.display = 'none';
-                }
-            });
-        });
-
-        // Initialize WaveSurfer
-        const wavesurfer = WaveSurfer.create({
-            container: '#waveform',
-            waveColor: '#9d50bb',
-            progressColor: '#6e48aa',
-            cursorColor: '#333',
-            barWidth: 2,
-            barGap: 1,
-            responsive: true,
-            height: 100
-        });
-        
-        const micWavesurfer = WaveSurfer.create({
-            container: '#mic-waveform',
-            waveColor: '#9d50bb',
-            progressColor: '#6e48aa',
-            cursorColor: '#333',
-            barWidth: 2,
-            barGap: 1,
-            responsive: true,
-            height: 100
-        });
-
-        // File Upload Handling
-        dropArea.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', handleFileSelect);
-
-        dropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropArea.style.borderColor = '#6e48aa';
-            dropArea.style.backgroundColor = '#f9f5ff';
-        });
-
-        dropArea.addEventListener('dragleave', () => {
-            dropArea.style.borderColor = '#ddd';
-            dropArea.style.backgroundColor = 'transparent';
-        });
-
-        dropArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropArea.style.borderColor = '#ddd';
-            dropArea.style.backgroundColor = 'transparent';
-            
-            if (e.dataTransfer.files.length) {
-                fileInput.files = e.dataTransfer.files;
-                handleFileSelect();
-            }
-        });
-
-        function handleFileSelect() {
-            const file = fileInput.files[0];
-            if (!file || !file.type.includes('audio')) {
-                alert('Please select a valid audio file (.wav format)');
-                return;
-            }
-            
-            fileName.textContent = file.name;
-            fileSize.textContent = formatFileSize(file.size);
-            fileDetails.style.display = 'block';
-            analyzeBtn.disabled = false;
-            resultContainer.style.display = 'none';
-            
-            // Load audio file into WaveSurfer
-            const fileURL = URL.createObjectURL(file);
-            wavesurfer.load(fileURL);
-            
-            wavesurfer.on('ready', function() {
-                fileDuration.textContent = formatTime(wavesurfer.getDuration());
-            });
-        }
-
-        // Microphone Recording Handling
-        let mediaRecorder;
-        let audioChunks = [];
-        let audioBlob;
-        
-        startRecordBtn.addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                
-                mediaRecorder.ondataavailable = (event) => {
-                    audioChunks.push(event.data);
-                };
-                
-                mediaRecorder.onstop = () => {
-                    audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    
-                    micWavesurfer.load(audioUrl);
-                    analyzeBtn.disabled = false;
-                };
-                
-                mediaRecorder.start();
-                startRecordBtn.disabled = true;
-                stopRecordBtn.disabled = false;
-                recStatus.textContent = "Recording... (speak now)";
-                recStatus.style.color = "#dc3545";
-            } catch (err) {
-                console.error('Error accessing microphone:', err);
-                alert('Unable to access microphone. Please check permissions.');
-            }
-        });
-        
-        stopRecordBtn.addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                startRecordBtn.disabled = false;
-                stopRecordBtn.disabled = true;
-                recStatus.textContent = "Recording stopped";
-                recStatus.style.color = "initial";
-            }
-        });
-
-        // Analysis Button
-        analyzeBtn.addEventListener('click', () => {
-            // Show loading state
-            analyzeBtn.disabled = true;
-            analyzeBtn.textContent = 'Analyzing...';
-            
-            // Simulate analysis delay (replace with actual API call)
-            setTimeout(() => {
-                // Reset button
-                analyzeBtn.disabled = false;
-                analyzeBtn.innerHTML = '<svg class="button-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 16.5L14.5 12L9.5 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg> Analyze Audio';
-                
-                // Simulate random result (replace with actual analysis results)
-                const isReal = Math.random() > 0.5;
-                const confidence = Math.floor(60 + Math.random() * 35); // Random confidence between 60-95%
-                
-                // Display result
-                resultContainer.style.display = 'block';
-                resultContainer.className = 'result-container ' + (isReal ? 'result-real' : 'result-fake');
-                resultTitle.textContent = isReal ? 'Real Audio Detected' : 'Fake Audio Detected';
-                confidenceValue.textContent = confidence;
-                
-                // Set confidence bar
-                confidenceBar.style.width = confidence + '%';
-                confidenceBar.style.backgroundColor = isReal ? '#28a745' : '#dc3545';
-                
-                // Scroll to results
-                resultContainer.scrollIntoView({ behavior: 'smooth' });
-            }, 2000);
-        });
-
-        // Utility functions
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return mins + ':' + (secs < 10 ? '0' : '') + secs;
-        }
-    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
